@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>扩展Spring Boot中的GET方法，支持复杂参数 | prebug.cn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="现在restful风格的webapi正大行其道，但是因为这并不是一个标准，而只是一种风格，所以每家的实现都各有特色，实践中也会因为各种各样的原因，灵活的突破restful的定义。这些问题当中，比较突出的一个就是经常会有把传递复杂参数的GET请求转换成POST请求的情况出现。这是因为HTTP的GET请求对body的发送没有明确定义，所以不好使用GET来进行复杂参数的发送，而POST则没有这些限制。比">
+<meta property="og:type" content="article">
+<meta property="og:title" content="扩展Spring Boot中的GET方法，支持复杂参数">
+<meta property="og:url" content="http://prebug.cn/2022/08/08/enhance-get-method/index.html">
+<meta property="og:site_name" content="prebug.cn">
+<meta property="og:description" content="现在restful风格的webapi正大行其道，但是因为这并不是一个标准，而只是一种风格，所以每家的实现都各有特色，实践中也会因为各种各样的原因，灵活的突破restful的定义。这些问题当中，比较突出的一个就是经常会有把传递复杂参数的GET请求转换成POST请求的情况出现。这是因为HTTP的GET请求对body的发送没有明确定义，所以不好使用GET来进行复杂参数的发送，而POST则没有这些限制。比">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-08-08T02:49:58.000Z">
+<meta property="article:modified_time" content="2023-04-09T12:02:07.656Z">
+<meta property="article:author" content="任志伟">
+<meta property="article:tag" content="spring boot">
+<meta property="article:tag" content="get">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="prebug.cn" type="application/atom+xml">
+  
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+
+  
+<link rel="stylesheet" href="/css/styles.css">
+
+  
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="main-menu-navbar">
+      <ul class="nav navbar-nav">
+        
+          <li><a class=""
+                 href="/index.html">Home</a></li>
+        
+          <li><a class=""
+                 href="/archives/">Archives</a></li>
+        
+      </ul>
+
+      <!--
+      <ul class="nav navbar-nav navbar-right">
+        
+          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
+        
+      </ul>
+      -->
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+  <div class="container">
+    <div class="blog-header">
+  <h1 class="blog-title">prebug.cn</h1>
+  
+</div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+          <article id="post-enhance-get-method" class="article article-type-post" itemscope itemprop="blogPost">
+
+  <header class="article-header">
+    
+  
+    <h1 class="article-title" itemprop="name">
+      扩展Spring Boot中的GET方法，支持复杂参数
+    </h1>
+  
+
+
+  </header>
+
+  <div class="article-meta">
+    <div class="article-datetime">
+  <a href="/2022/08/08/enhance-get-method/" class="article-date"><time datetime="2022-08-08T02:49:58.000Z" itemprop="datePublished">2022-08-08</time></a>
+</div>
+
+    
+    
+
+  </div>
+  <div class="article-inner">
+
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>现在restful风格的webapi正大行其道，但是因为这并不是一个标准，而只是一种风格，所以每家的实现都各有特色，实践中也会因为各种各样的原因，灵活的突破restful的定义。<br>这些问题当中，比较突出的一个就是经常会有把传递复杂参数的GET请求转换成POST请求的情况出现。这是因为HTTP的GET请求对body的发送没有明确定义，所以不好使用GET来进行复杂参数的发送，而POST则没有这些限制。比较典型的一个场景就是进行复杂条件的数据查询，按照restful风格的定义来说，这是一个典型的使用GET请求的场景，而实践中却经常会被灵活的POST化。<br>为了解决这个问题，给大家总结下一个比较常用的解决方案：url中接受一个被编码(如base64)的复杂对象，并通过自定义注解，在接口调用前对这个被编码的对象进行解码，并转换成bean对象进行使用。<br>主要代码展示如下，请大家按需修改使用：</p>
+<ul>
+<li><p>controller: restful api的定义</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @Data 注解来自lombok，避免我们手写get、set方法</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PageQuery</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Integer size;</span><br><span class="line">    <span class="keyword">private</span> Integer current;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String,String&gt; condition;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/app&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AppController</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 分页查询</span></span><br><span class="line"><span class="comment">     * 可传递查询参数，按照某些字段分页查询</span></span><br><span class="line"><span class="comment">     * GET host/app/page?&#123;复杂对象经过base64编码后的字符串&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> pageQuery 分页条件，查询参数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 分页查询结果</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/page&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">page</span><span class="params">( <span class="meta">@RequestJson</span> PageQuery pageQuery)</span> &#123;</span><br><span class="line">        <span class="comment">// pageQuery为get方法传入的复杂对象</span></span><br><span class="line">        <span class="comment">// 此处处理查询逻辑</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+<li><p>上一步中会法发现注解RequestJson找不到，所以需要进行一下定义</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * get 请求参数使用该注解就会使用自定义的参数解析器来解析复杂的参数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target(ElementType.PARAMETER)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> RequestJson &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>自定义注解的解析器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 自定义参数解析器，请求参数使用该注解 &#123;<span class="doctag">@link</span> RequestJson&#125; 就会使用以下解析方式。</span></span><br><span class="line"><span class="comment"> * 说明：前端将参数序列化成 json，再经过 Base64 编码之后放在 url 上传输。</span></span><br><span class="line"><span class="comment"> * 后端 Base64 解码之后，再通过 json 工具将参数反序列化为对象。</span></span><br><span class="line"><span class="comment"> * 例如：http://localhost:8080/app/page?eyJjdXJyZW50IjoxLCJzaXplIjoxMCwidG90YWwiaG9uZSI6IiJ9fQ==</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HandlerRequestJsonArgumentResolver</span> <span class="keyword">implements</span> <span class="title class_">HandlerMethodArgumentResolver</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该方法判断是否要使用该参数解析器。这里我们就判断 有没有使用 <span class="doctag">@RequestJson</span> 注解来判断是否使用该解析器</span></span><br><span class="line"><span class="comment">     * 如果返回 true 就运行 resolveArgument 方法来解析参数</span></span><br><span class="line"><span class="comment">     * 如果返回 false 使用其他参数解析器来解析参数，springframework 有很多参数解析器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">supportsParameter</span><span class="params">(MethodParameter parameter)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> parameter.hasParameterAnnotation(RequestJson.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该方法真正用来解析参数。</span></span><br><span class="line"><span class="comment">     * 先将 json 字符串解析出来</span></span><br><span class="line"><span class="comment">     * 再将 json 转成 Bean 对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">resolveArgument</span><span class="params">(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">HttpServletRequest</span> <span class="variable">request</span> <span class="operator">=</span> webRequest.getNativeRequest(HttpServletRequest.class);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">json</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>( Base64.getDecoder().decode(request.getQueryString()), <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">            ObjectMapper objectMapper=<span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">            <span class="keyword">return</span>  objectMapper.readValue( json, parameter.getParameterType());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            log.error(<span class="string">&quot;请求参数解析失败，请检查！&quot;</span> + e.getMessage());</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>注册自定义参数解析器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WebConfig</span> <span class="keyword">implements</span> <span class="title class_">WebMvcConfigurer</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 注册自定义参数解析器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addArgumentResolvers</span><span class="params">(List&lt;HandlerMethodArgumentResolver&gt; resolvers)</span> &#123;</span><br><span class="line">        resolvers.add(<span class="keyword">new</span> <span class="title class_">HandlerRequestJsonArgumentResolver</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>PS. 处理方法及示例代码基本参考（COPY）网络资源</p>
+
+      
+    </div>
+
+    
+      
+
+    
+
+    <footer class="article-footer">
+      <a data-url="http://prebug.cn/2022/08/08/enhance-get-method/" data-id="clg9elzh30000ro9d56uw83o1" class="article-share-link">
+        <i class="fa fa-share"></i> Share
+      </a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/get/" rel="tag">get</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+<ul id="article-nav" class="nav nav-pills nav-justified">
+  
+  <li role="presentation">
+    <a href="/2022/08/05/life-1/" id="article-nav-older" class="article-nav-link-wrap">
+      <i class="fa fa-chevron-left pull-left"></i>
+      <span class="article-nav-link-title">生活随感</span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+
+  
+</article>
+
+
+
+
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          
+  <div class="sidebar-module sidebar-module-inset">
+  <h4>About</h4>
+  <p>一个忙忙碌碌，但是似乎是把一年的工作经验用了十几年的软件开发工程师。</p>
+
+</div>
+
+
+  
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tags</h4>
+    <ul class="sidebar-module-list" itemprop="keywords"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/docker/" rel="tag">docker</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/get/" rel="tag">get</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/live/" rel="tag">live</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mongodb/" rel="tag">mongodb</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a><span class="sidebar-module-list-count">1</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tag Cloud</h4>
+    <p class="tagcloud">
+      <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/get/" style="font-size: 10px;">get</a> <a href="/tags/live/" style="font-size: 10px;">live</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a>
+    </p>
+  </div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Archives</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2022/08/">八月 2022</a><span class="sidebar-module-list-count">3</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Recents</h4>
+    <ul class="sidebar-module-list">
+      
+        <li>
+          <a href="/2022/08/08/enhance-get-method/">扩展Spring Boot中的GET方法，支持复杂参数</a>
+        </li>
+      
+        <li>
+          <a href="/2022/08/05/life-1/">生活随感</a>
+        </li>
+      
+        <li>
+          <a href="/2022/08/05/install-mongodb-with-docker/">使用docker安装mongodb</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+        </div>
+    </div>
+  </div>
+  <footer class="blog-footer">
+  <div class="container">
+    <div id="footer-info" class="inner">
+      &copy; 2023 任志伟<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a><br/>
+      <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">京ICP备19039047号-2</a>
+    </div>
+  </div>
+</footer>
+
+  
+
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js" ></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+</body>
+</html>
