@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>最初的WebApi</title>
+    <link href="/2023/04/09/webapi-010/"/>
+    <url>/2023/04/09/webapi-010/</url>
+    
+    <content type="html"><![CDATA[<h1 id="前置条件"><a href="#前置条件" class="headerlink" title="前置条件"></a>前置条件</h1><ol><li>安装dotnet core sdk(7.0)<br><a href="https://dotnet.microsoft.com/zh-cn/download/dotnet/7.0">下载 .NET 7.0 (Linux、macOS 和 Windows) (microsoft.com)</a></li><li>安装visual studio code，并安装C# 插件<br><a href="https://code.visualstudio.com/">Visual Studio Code - Code Editing. Redefined</a></li><li>安装Postgresql数据库<br>为了方便，我们使用docker来安装Postgresql<a href="https://prebug.cn/2023/04/09/postgres-in-docker/">在docker中启动PostgreSQL服务 | prebug.cn</a></li></ol><h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><ol><li>先为我们的代码找一个存放的位置，我用的是windows 11操作系统，以下的操作如果没有额外说明，也都会是在此系统下进行。首先打开终端（如果不会，WIN+X组合键弹出的菜单中，选择【终端(I)】即可），并逐条来执行以下命令，每个命令都有解释，但不会详细展开，以后也是这个风格。<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 回到根目录下，因为是使用的固态硬盘，所以没有必要进行分区</span><br><span class="line">cd c:\</span><br><span class="line">// 建个目录（也叫文件夹，看习惯吧）用来存放代码，</span><br><span class="line">// -p参数帮助我们直接建好较深的路径，而不需要逐级去创建</span><br><span class="line">mkdir -p /exercise/c-sharp/dream/</span><br><span class="line">// 切换到我们新建的目录之下</span><br><span class="line">cd C:\Exercise\c-sharp\dream\</span><br></pre></td></tr></table></figure></li><li>验证一下我们的dotnet core sdk是不是已经安装配置好了<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 此时使用dotnet info 和 dotnet --list-sdks均可，因为我主要想看看sdk，所以我们选择后者</span><br><span class="line">dotnet --list-sdks</span><br></pre></td></tr></table></figure>我本机响应如下，具体显示版本自然是与之前安装的版本相关<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">7.0.300-preview.23122.5 [C:\Program Files\dotnet\sdk]</span><br></pre></td></tr></table></figure></li><li>使用sdk自带的项目模板来创建一个WebApi项目<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 使用dotnet new list可以查看所有可以通过dotnet new命令来创建的项目模板，</span><br><span class="line">// 我们根据需要创建一个webapi项目。</span><br><span class="line">// -o 参数指定输出路径，不指定则会输出在当前目录。</span><br><span class="line">// 更多参数可以查看dotnet new webapi -h。</span><br><span class="line">dotnet new webapi -o WebAPI</span><br></pre></td></tr></table></figure></li><li>此时WebApi项目的基础结构就已经完成了，我们不着急看项目的内容，直接先来把代码跑起来看看<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 先看一下我们的当前目录位置，如果没乱动的话，现在还应该在C:\Exercise\c-sharp\dream\目录下</span><br><span class="line">pwd</span><br><span class="line">// 上一步我们把webapi的项目输出指定在了WebAPI下，所以我们还是先切换到该目录之下</span><br><span class="line">cd .\WebAPI\</span><br><span class="line">// 现在可以把我们的代码（虽然没有一行是亲自写的）跑起来了</span><br><span class="line">dotnet run</span><br></pre></td></tr></table></figure>响应结果正常应该是这个样子<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">正在生成...</span><br><span class="line">info: Microsoft.Hosting.Lifetime[14]</span><br><span class="line">      Now listening on: [http://localhost:5267](http://localhost:5267)</span><br><span class="line">info: Microsoft.Hosting.Lifetime[0]</span><br><span class="line">      Application started. Press Ctrl+C to shut down.</span><br><span class="line">info: Microsoft.Hosting.Lifetime[0]</span><br><span class="line">      Hosting environment: Development</span><br><span class="line">info: Microsoft.Hosting.Lifetime[0]</span><br><span class="line">      Content root path: C:\Exercise\c-sharp\dream\WebAPI</span><br></pre></td></tr></table></figure>这里面提供了这么几个信息，一是监听地址为<a href="http://localhost:5267/">http://localhost:5267</a>，也就是我们系统跑起来之后用于访问的url，二是可以使用ctrl+c组合键关掉系统，三是环境变量，目前我们是使用的开发环境（Development），最后是我们的项目内容的根目录。</li><li>测试一下<br>可以尝试在浏览器里访问一下上一步中得到的系统地址<a href="http://localhost:5267/">http://localhost:5267</a>，我不想截图，所以我会用命令行的形式进行下面的测试<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 先测试上一步中得到的系统地址[http://localhost:5267](http://localhost:5267)，</span><br><span class="line">// 浏览器访问使用的是GET方法，我们也一样使用GET方法。</span><br><span class="line">// Windows下的终端是PowerShell，所以我们使用的是Invoke-WebRequest命令，而不是curl，</span><br><span class="line">// 当然如果执行curl也会有结果，但这里的curl也只是Invoke-WebRequest的别名而已。</span><br><span class="line">Invoke-WebRequest -Method Get -Uri http://localhost:5267</span><br></pre></td></tr></table></figure>此时我们得到的响应结果可能和预期不一致，居然是一个“Invoke-WebRequest : 远程服务器返回错误: (404) 未找到。”的错误。<br>这个原因很简单，因为我们是使用了一个webapi模板，这个模板中是没有默认的页面（诸如index.html之类)的。当然我们的模板项目也不是一个纯纯的空项目，也还是提供了一个APIController的。<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 后面看代码的时候，我们会看到模板中提供了WeatherForecastController，</span><br><span class="line">// 而且实现了Get方法，所以我们可以用以下命令进行测试</span><br><span class="line">Invoke-WebRequest -Method Get -Uri http://localhost:5267/weatherforecast</span><br></pre></td></tr></table></figure>这次我们应该会得到一个正常（状态码为200）的响应结果了<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">StatusCode        : 200</span><br><span class="line">StatusDescription : OK</span><br><span class="line">Content           : [&#123;&quot;date&quot;:&quot;2023-04-10&quot;,&quot;temperatureC&quot;:10,&quot;temperatureF&quot;:49,&quot;summary&quot;:&quot;Hot&quot;&#125;,&#123;&quot;date&quot;:&quot;2023-04-11&quot;,&quot;temperatureC&quot;:40,&quot;temperatureF&quot;:103,&quot;summary&quot;:&quot;Warm&quot;&#125;,&#123;&quot;date&quot;:&quot;2023-04-12&quot;,&quot;temperatureC&quot;:-</span><br><span class="line">                    15,&quot;temperat...</span><br><span class="line">RawContent        : HTTP/1.1 200 OK</span><br><span class="line">                    Transfer-Encoding: chunked</span><br><span class="line">                    Content-Type: application/json; charset=utf-8</span><br><span class="line">                    Date: Sun, 09 Apr 2023 14:43:10 GMT</span><br><span class="line">                    Server: Kestrel</span><br><span class="line"></span><br><span class="line">                    [&#123;&quot;date&quot;:&quot;2023-04-10&quot;,&quot;temperatureC&quot;:10,&quot;temperature...</span><br><span class="line">Forms             : &#123;&#125;</span><br><span class="line">Headers           : &#123;[Transfer-Encoding, chunked], [Content-Type, application/json; charset=utf-8], [Date, Sun, 09 Apr 2023 14:43:10 GMT], [Server, Kestrel]&#125;</span><br><span class="line">Images            : &#123;&#125;</span><br><span class="line">InputFields       : &#123;&#125;</span><br><span class="line">Links             : &#123;&#125;</span><br><span class="line">ParsedHtml        : mshtml.HTMLDocumentClass</span><br><span class="line">RawContentLength  : 383</span><br></pre></td></tr></table></figure>本篇到此结束，下一篇我们再来看看模板项目里究竟有哪些代码内容。</li></ol>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>dotnet</tag>
+      
+      <tag>dotnet core</tag>
+      
+      <tag>webapi</tag>
+      
+      <tag>asp.net core</tag>
+      
+      <tag>C#</tag>
+      
+      <tag>c-sharp</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>在docker中启动PostgreSQL服务</title>
+    <link href="/2023/04/09/postgres-in-docker/"/>
+    <url>/2023/04/09/postgres-in-docker/</url>
+    
+    <content type="html"><![CDATA[<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --name postgres --restart always -e POSTGRES_PASSWORD=&#x27;abc123&#x27; -e ALLOW_IP_RANGE=0.0.0.0/0 -p 55433:5432 -d postgres</span><br></pre></td></tr></table></figure><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name postgres --restart always -e POSTGRES_USER=&#x27;postgres&#x27; -e POSTGRES_PASSWORD=&#x27;abc123&#x27; -e ALLOW_IP_RANGE=0.0.0.0/0 -v /home/postgres/data:/var/lib/postgresql -p 5432:5432 -t postgres</span><br></pre></td></tr></table></figure><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">```shell</span><br><span class="line">docker run -d --name postgres --restart always -e POSTGRES_USER=&#x27;postgres&#x27; -e POSTGRES_PASSWORD=&#x27;abc123&#x27; -e ALLOW_IP_RANGE=0.0.0.0/0 -v c:/docker/postgres:/var/lib/postgresql -p 5432:5432 -t postgres</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>docker</tag>
+      
+      <tag>postgres</tag>
+      
+      <tag>PostgreSQL</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>在docker中启动mysql服务</title>
+    <link href="/2023/04/09/mysql-in-docker/"/>
+    <url>/2023/04/09/mysql-in-docker/</url>
+    
+    <content type="html"><![CDATA[<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -itd --name mysql-test -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>docker</tag>
+      
+      <tag>mysql</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>扩展Spring Boot中的GET方法，支持复杂参数</title>
+    <link href="/2022/08/08/enhance-get-method/"/>
+    <url>/2022/08/08/enhance-get-method/</url>
+    
+    <content type="html"><![CDATA[<p>现在restful风格的webapi正大行其道，但是因为这并不是一个标准，而只是一种风格，所以每家的实现都各有特色，实践中也会因为各种各样的原因，灵活的突破restful的定义。<br>这些问题当中，比较突出的一个就是经常会有把传递复杂参数的GET请求转换成POST请求的情况出现。这是因为HTTP的GET请求对body的发送没有明确定义，所以不好使用GET来进行复杂参数的发送，而POST则没有这些限制。比较典型的一个场景就是进行复杂条件的数据查询，按照restful风格的定义来说，这是一个典型的使用GET请求的场景，而实践中却经常会被灵活的POST化。<br>为了解决这个问题，给大家总结下一个比较常用的解决方案：url中接受一个被编码(如base64)的复杂对象，并通过自定义注解，在接口调用前对这个被编码的对象进行解码，并转换成bean对象进行使用。<br>主要代码展示如下，请大家按需修改使用：</p><ul><li><p>controller: restful api的定义</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// @Data 注解来自lombok，避免我们手写get、set方法</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">PageQuery</span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Integer size;</span><br><span class="line">    <span class="keyword">private</span> Integer current;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String,String&gt; condition;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/app&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">AppController</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 分页查询</span></span><br><span class="line"><span class="comment">     * 可传递查询参数，按照某些字段分页查询</span></span><br><span class="line"><span class="comment">     * GET host/app/page?&#123;复杂对象经过base64编码后的字符串&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> pageQuery 分页条件，查询参数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 分页查询结果</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@GetMapping(&quot;/page&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">page</span><span class="params">( <span class="meta">@RequestJson</span> PageQuery pageQuery)</span> &#123;</span><br><span class="line">        <span class="comment">// pageQuery为get方法传入的复杂对象</span></span><br><span class="line">        <span class="comment">// 此处处理查询逻辑</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li><p>上一步中会法发现注解RequestJson找不到，所以需要进行一下定义</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * get 请求参数使用该注解就会使用自定义的参数解析器来解析复杂的参数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Target(ElementType.PARAMETER)</span></span><br><span class="line"><span class="meta">@Retention(RetentionPolicy.RUNTIME)</span></span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> RequestJson &#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li><p>自定义注解的解析器</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 自定义参数解析器，请求参数使用该注解 &#123;<span class="doctag">@link</span> RequestJson&#125; 就会使用以下解析方式。</span></span><br><span class="line"><span class="comment"> * 说明：前端将参数序列化成 json，再经过 Base64 编码之后放在 url 上传输。</span></span><br><span class="line"><span class="comment"> * 后端 Base64 解码之后，再通过 json 工具将参数反序列化为对象。</span></span><br><span class="line"><span class="comment"> * 例如：http://localhost:8080/app/page?eyJjdXJyZW50IjoxLCJzaXplIjoxMCwidG90YWwiaG9uZSI6IiJ9fQ==</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Slf4j</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HandlerRequestJsonArgumentResolver</span> <span class="keyword">implements</span> <span class="title class_">HandlerMethodArgumentResolver</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该方法判断是否要使用该参数解析器。这里我们就判断 有没有使用 <span class="doctag">@RequestJson</span> 注解来判断是否使用该解析器</span></span><br><span class="line"><span class="comment">     * 如果返回 true 就运行 resolveArgument 方法来解析参数</span></span><br><span class="line"><span class="comment">     * 如果返回 false 使用其他参数解析器来解析参数，springframework 有很多参数解析器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">supportsParameter</span><span class="params">(MethodParameter parameter)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> parameter.hasParameterAnnotation(RequestJson.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该方法真正用来解析参数。</span></span><br><span class="line"><span class="comment">     * 先将 json 字符串解析出来</span></span><br><span class="line"><span class="comment">     * 再将 json 转成 Bean 对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">resolveArgument</span><span class="params">(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">HttpServletRequest</span> <span class="variable">request</span> <span class="operator">=</span> webRequest.getNativeRequest(HttpServletRequest.class);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">json</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>( Base64.getDecoder().decode(request.getQueryString()), <span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">            ObjectMapper objectMapper=<span class="keyword">new</span> <span class="title class_">ObjectMapper</span>();</span><br><span class="line">            <span class="keyword">return</span>  objectMapper.readValue( json, parameter.getParameterType());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            log.error(<span class="string">&quot;请求参数解析失败，请检查！&quot;</span> + e.getMessage());</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li><li><p>注册自定义参数解析器</p><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">WebConfig</span> <span class="keyword">implements</span> <span class="title class_">WebMvcConfigurer</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 注册自定义参数解析器</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">addArgumentResolvers</span><span class="params">(List&lt;HandlerMethodArgumentResolver&gt; resolvers)</span> &#123;</span><br><span class="line">        resolvers.add(<span class="keyword">new</span> <span class="title class_">HandlerRequestJsonArgumentResolver</span>());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li></ul><p>PS. 处理方法及示例代码基本参考（COPY）网络资源</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>spring boot</tag>
+      
+      <tag>get</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>生活随感</title>
+    <link href="/2022/08/05/life-1/"/>
+    <url>/2022/08/05/life-1/</url>
+    
+    <content type="html"><![CDATA[<p>今天又在远程连接家里的电脑工作的时候，突然发现编辑器上由空格不断的输出，我知道是我的好好又爬到电脑桌上了。<br>这样就很满足。<br>生活嘛~</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>live</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>使用docker安装mongodb</title>
+    <link href="/2022/08/05/install-mongodb-with-docker/"/>
+    <url>/2022/08/05/install-mongodb-with-docker/</url>
+    
+    <content type="html"><![CDATA[<ol><li>运行容器</li></ol><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -itd --name mongo -p 27017:27017 mongo --auth</span><br></pre></td></tr></table></figure><ol start="2"><li>安装测试</li></ol><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it mongo mongo adminsh</span><br><span class="line"><span class="comment"># 创建一个名为 admin，密码为 123456 的用户。</span></span><br><span class="line">$  db.createUser(&#123; user:<span class="string">&#x27;admin&#x27;</span>,<span class="built_in">pwd</span>:<span class="string">&#x27;123456&#x27;</span>,roles:[ &#123; role:<span class="string">&#x27;userAdminAnyDatabase&#x27;</span>, db: <span class="string">&#x27;admin&#x27;</span>&#125;,<span class="string">&quot;readWriteAnyDatabase&quot;</span>]&#125;);</span><br><span class="line"><span class="comment"># 尝试使用上面创建的用户信息进行连接。</span></span><br><span class="line">$ db.auth(<span class="string">&#x27;admin&#x27;</span>, <span class="string">&#x27;123456&#x27;</span>)</span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>docker</tag>
+      
+      <tag>mongodb</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
