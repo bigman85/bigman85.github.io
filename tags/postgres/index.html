@@ -3,20 +3,14 @@
 <head>
   <meta charset="utf-8">
   
-  <title>使用docker安装mongodb | prebug.cn</title>
+  <title>Tag: postgres | prebug.cn</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="运行容器  1$ docker run -itd --name mongo -p 27017:27017 mongo --auth  安装测试  12345docker exec -it mongo mongo adminsh# 创建一个名为 admin，密码为 123456 的用户。$  db.createUser(&amp;#123; user:&amp;#x27;admin&amp;#x27;,pwd:&amp;#x27">
-<meta property="og:type" content="article">
-<meta property="og:title" content="使用docker安装mongodb">
-<meta property="og:url" content="http://prebug.cn/2022/08/05/install-mongodb-with-docker/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="prebug.cn">
+<meta property="og:url" content="http://prebug.cn/tags/postgres/index.html">
 <meta property="og:site_name" content="prebug.cn">
-<meta property="og:description" content="运行容器  1$ docker run -itd --name mongo -p 27017:27017 mongo --auth  安装测试  12345docker exec -it mongo mongo adminsh# 创建一个名为 admin，密码为 123456 的用户。$  db.createUser(&amp;#123; user:&amp;#x27;admin&amp;#x27;,pwd:&amp;#x27">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-08-05T07:09:07.000Z">
-<meta property="article:modified_time" content="2023-04-09T12:02:07.656Z">
 <meta property="article:author" content="任志伟">
-<meta property="article:tag" content="docker">
-<meta property="article:tag" content="mongodb">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="prebug.cn" type="application/atom+xml">
@@ -82,77 +76,40 @@
 
     <div class="row">
         <div class="col-sm-8 blog-main">
-          <article id="post-install-mongodb-with-docker" class="article article-type-post" itemscope itemprop="blogPost">
-
-  <header class="article-header">
+          
+  
+  
+    
+    
+      
+      
+      <section class="archives-wrap">
+        <div class="archive-year-wrap">
+          <a href="/archives/2023" class="archive-year">2023</a>
+        </div>
+        <div class="archives">
+    
+    <article class="archive-article archive-type-post">
+  <header class="archive-article-header">
     
   
-    <h1 class="article-title" itemprop="name">
-      使用docker安装mongodb
+    <h1 itemprop="name">
+      <a class="archive-article-title" href="/2023/04/09/postgres-in-docker/">在docker中启动PostgreSQL服务</a>
     </h1>
   
 
 
-  </header>
-
-  <div class="article-meta">
     <div class="article-datetime">
-  <a href="/2022/08/05/install-mongodb-with-docker/" class="article-date"><time datetime="2022-08-05T07:09:07.000Z" itemprop="datePublished">2022-08-05</time></a>
+  <a href="/2023/04/09/postgres-in-docker/" class="archive-article-date"><time datetime="2023-04-09T13:34:27.000Z" itemprop="datePublished">四月 9日</time></a>
 </div>
 
-    
-    
-
-  </div>
-  <div class="article-inner">
-
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ol>
-<li>运行容器</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -itd --name mongo -p 27017:27017 mongo --auth</span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li>安装测试</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it mongo mongo adminsh</span><br><span class="line"><span class="comment"># 创建一个名为 admin，密码为 123456 的用户。</span></span><br><span class="line">$  db.createUser(&#123; user:<span class="string">&#x27;admin&#x27;</span>,<span class="built_in">pwd</span>:<span class="string">&#x27;123456&#x27;</span>,roles:[ &#123; role:<span class="string">&#x27;userAdminAnyDatabase&#x27;</span>, db: <span class="string">&#x27;admin&#x27;</span>&#125;,<span class="string">&quot;readWriteAnyDatabase&quot;</span>]&#125;);</span><br><span class="line"><span class="comment"># 尝试使用上面创建的用户信息进行连接。</span></span><br><span class="line">$ db.auth(<span class="string">&#x27;admin&#x27;</span>, <span class="string">&#x27;123456&#x27;</span>)</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-      
-
-    
-
-    <footer class="article-footer">
-      <a data-url="http://prebug.cn/2022/08/05/install-mongodb-with-docker/" data-id="clg9elzh80001ro9da8x8gs0x" class="article-share-link">
-        <i class="fa fa-share"></i> Share
-      </a>
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mongodb/" rel="tag">mongodb</a></li></ul>
-
-
-    </footer>
-  </div>
-  
-    
-<ul id="article-nav" class="nav nav-pills nav-justified">
-  
-  
-  <li role="presentation">
-    <a href="/2022/08/05/life-1/" id="article-nav-newer" class="article-nav-link-wrap">
-      <span class="article-nav-link-title">生活随感</span>
-      <i class="fa fa-chevron-right pull-right"></i>
-    </a>
-  </li>
-  
-</ul>
-
-
-  
+  </header>
 </article>
+
+  
+  
+    </div></section>
+  
 
 
 
