@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>最初的WebApi | prebug.cn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="前置条件 安装dotnet core sdk(7.0)下载 .NET 7.0 (Linux、macOS 和 Windows) (microsoft.com) 安装visual studio code，并安装C# 插件Visual Studio Code - Code Editing. Redefined 安装Postgresql数据库为了方便，我们使用docker来安装Postgresql在doc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最初的WebApi">
+<meta property="og:url" content="http://prebug.cn/2023/04/09/webapi-010/index.html">
+<meta property="og:site_name" content="prebug.cn">
+<meta property="og:description" content="前置条件 安装dotnet core sdk(7.0)下载 .NET 7.0 (Linux、macOS 和 Windows) (microsoft.com) 安装visual studio code，并安装C# 插件Visual Studio Code - Code Editing. Redefined 安装Postgresql数据库为了方便，我们使用docker来安装Postgresql在doc">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-09T14:56:05.000Z">
+<meta property="article:modified_time" content="2023-04-09T15:04:25.217Z">
+<meta property="article:author" content="任志伟">
+<meta property="article:tag" content="dotnet">
+<meta property="article:tag" content="dotnet core">
+<meta property="article:tag" content="webapi">
+<meta property="article:tag" content="asp.net core">
+<meta property="article:tag" content="C#">
+<meta property="article:tag" content="c-sharp">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="prebug.cn" type="application/atom+xml">
+  
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" integrity="sha384-XdYbMnZ/QjLh6iI4ogqCTaIjrFk87ip+ekIjefZch0Y+PvJ8CDYtEs1ipDmPorQ+" crossorigin="anonymous">
+
+  
+<link rel="stylesheet" href="/css/styles.css">
+
+  
+
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+<body>
+  <nav class="navbar navbar-inverse">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-menu-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="main-menu-navbar">
+      <ul class="nav navbar-nav">
+        
+          <li><a class=""
+                 href="/index.html">Home</a></li>
+        
+          <li><a class=""
+                 href="/archives/">Archives</a></li>
+        
+      </ul>
+
+      <!--
+      <ul class="nav navbar-nav navbar-right">
+        
+          <li><a href="/atom.xml" title="RSS Feed"><i class="fa fa-rss"></i></a></li>
+        
+      </ul>
+      -->
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+  <div class="container">
+    <div class="blog-header">
+  <h1 class="blog-title">prebug.cn</h1>
+  
+</div>
+
+    <div class="row">
+        <div class="col-sm-8 blog-main">
+          <article id="post-webapi-010" class="article article-type-post" itemscope itemprop="blogPost">
+
+  <header class="article-header">
+    
+  
+    <h1 class="article-title" itemprop="name">
+      最初的WebApi
+    </h1>
+  
+
+
+  </header>
+
+  <div class="article-meta">
+    <div class="article-datetime">
+  <a href="/2023/04/09/webapi-010/" class="article-date"><time datetime="2023-04-09T14:56:05.000Z" itemprop="datePublished">2023-04-09</time></a>
+</div>
+
+    
+    
+
+  </div>
+  <div class="article-inner">
+
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前置条件"><a href="#前置条件" class="headerlink" title="前置条件"></a>前置条件</h1><ol>
+<li>安装dotnet core sdk(7.0)<br><a target="_blank" rel="noopener" href="https://dotnet.microsoft.com/zh-cn/download/dotnet/7.0">下载 .NET 7.0 (Linux、macOS 和 Windows) (microsoft.com)</a></li>
+<li>安装visual studio code，并安装C# 插件<br><a target="_blank" rel="noopener" href="https://code.visualstudio.com/">Visual Studio Code - Code Editing. Redefined</a></li>
+<li>安装Postgresql数据库<br>为了方便，我们使用docker来安装Postgresql<a href="https://prebug.cn/2023/04/09/postgres-in-docker/">在docker中启动PostgreSQL服务 | prebug.cn</a></li>
+</ol>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><ol>
+<li>先为我们的代码找一个存放的位置，我用的是windows 11操作系统，以下的操作如果没有额外说明，也都会是在此系统下进行。首先打开终端（如果不会，WIN+X组合键弹出的菜单中，选择【终端(I)】即可），并逐条来执行以下命令，每个命令都有解释，但不会详细展开，以后也是这个风格。<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 回到根目录下，因为是使用的固态硬盘，所以没有必要进行分区</span><br><span class="line">cd c:\</span><br><span class="line">// 建个目录（也叫文件夹，看习惯吧）用来存放代码，</span><br><span class="line">// -p参数帮助我们直接建好较深的路径，而不需要逐级去创建</span><br><span class="line">mkdir -p /exercise/c-sharp/dream/</span><br><span class="line">// 切换到我们新建的目录之下</span><br><span class="line">cd C:\Exercise\c-sharp\dream\</span><br></pre></td></tr></table></figure></li>
+<li>验证一下我们的dotnet core sdk是不是已经安装配置好了<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 此时使用dotnet info 和 dotnet --list-sdks均可，因为我主要想看看sdk，所以我们选择后者</span><br><span class="line">dotnet --list-sdks</span><br></pre></td></tr></table></figure>
+我本机响应如下，具体显示版本自然是与之前安装的版本相关<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">7.0.300-preview.23122.5 [C:\Program Files\dotnet\sdk]</span><br></pre></td></tr></table></figure></li>
+<li>使用sdk自带的项目模板来创建一个WebApi项目<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 使用dotnet new list可以查看所有可以通过dotnet new命令来创建的项目模板，</span><br><span class="line">// 我们根据需要创建一个webapi项目。</span><br><span class="line">// -o 参数指定输出路径，不指定则会输出在当前目录。</span><br><span class="line">// 更多参数可以查看dotnet new webapi -h。</span><br><span class="line">dotnet new webapi -o WebAPI</span><br></pre></td></tr></table></figure></li>
+<li>此时WebApi项目的基础结构就已经完成了，我们不着急看项目的内容，直接先来把代码跑起来看看<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 先看一下我们的当前目录位置，如果没乱动的话，现在还应该在C:\Exercise\c-sharp\dream\目录下</span><br><span class="line">pwd</span><br><span class="line">// 上一步我们把webapi的项目输出指定在了WebAPI下，所以我们还是先切换到该目录之下</span><br><span class="line">cd .\WebAPI\</span><br><span class="line">// 现在可以把我们的代码（虽然没有一行是亲自写的）跑起来了</span><br><span class="line">dotnet run</span><br></pre></td></tr></table></figure>
+响应结果正常应该是这个样子<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">正在生成...</span><br><span class="line">info: Microsoft.Hosting.Lifetime[14]</span><br><span class="line">      Now listening on: [http://localhost:5267](http://localhost:5267)</span><br><span class="line">info: Microsoft.Hosting.Lifetime[0]</span><br><span class="line">      Application started. Press Ctrl+C to shut down.</span><br><span class="line">info: Microsoft.Hosting.Lifetime[0]</span><br><span class="line">      Hosting environment: Development</span><br><span class="line">info: Microsoft.Hosting.Lifetime[0]</span><br><span class="line">      Content root path: C:\Exercise\c-sharp\dream\WebAPI</span><br></pre></td></tr></table></figure>
+这里面提供了这么几个信息，一是监听地址为<a target="_blank" rel="noopener" href="http://localhost:5267/">http://localhost:5267</a>，也就是我们系统跑起来之后用于访问的url，二是可以使用ctrl+c组合键关掉系统，三是环境变量，目前我们是使用的开发环境（Development），最后是我们的项目内容的根目录。</li>
+<li>测试一下<br>可以尝试在浏览器里访问一下上一步中得到的系统地址<a target="_blank" rel="noopener" href="http://localhost:5267/">http://localhost:5267</a>，我不想截图，所以我会用命令行的形式进行下面的测试<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 先测试上一步中得到的系统地址[http://localhost:5267](http://localhost:5267)，</span><br><span class="line">// 浏览器访问使用的是GET方法，我们也一样使用GET方法。</span><br><span class="line">// Windows下的终端是PowerShell，所以我们使用的是Invoke-WebRequest命令，而不是curl，</span><br><span class="line">// 当然如果执行curl也会有结果，但这里的curl也只是Invoke-WebRequest的别名而已。</span><br><span class="line">Invoke-WebRequest -Method Get -Uri http://localhost:5267</span><br></pre></td></tr></table></figure>
+此时我们得到的响应结果可能和预期不一致，居然是一个“Invoke-WebRequest : 远程服务器返回错误: (404) 未找到。”的错误。<br>这个原因很简单，因为我们是使用了一个webapi模板，这个模板中是没有默认的页面（诸如index.html之类)的。当然我们的模板项目也不是一个纯纯的空项目，也还是提供了一个APIController的。<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 后面看代码的时候，我们会看到模板中提供了WeatherForecastController，</span><br><span class="line">// 而且实现了Get方法，所以我们可以用以下命令进行测试</span><br><span class="line">Invoke-WebRequest -Method Get -Uri http://localhost:5267/weatherforecast</span><br></pre></td></tr></table></figure>
+这次我们应该会得到一个正常（状态码为200）的响应结果了<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">StatusCode        : 200</span><br><span class="line">StatusDescription : OK</span><br><span class="line">Content           : [&#123;&quot;date&quot;:&quot;2023-04-10&quot;,&quot;temperatureC&quot;:10,&quot;temperatureF&quot;:49,&quot;summary&quot;:&quot;Hot&quot;&#125;,&#123;&quot;date&quot;:&quot;2023-04-11&quot;,&quot;temperatureC&quot;:40,&quot;temperatureF&quot;:103,&quot;summary&quot;:&quot;Warm&quot;&#125;,&#123;&quot;date&quot;:&quot;2023-04-12&quot;,&quot;temperatureC&quot;:-</span><br><span class="line">                    15,&quot;temperat...</span><br><span class="line">RawContent        : HTTP/1.1 200 OK</span><br><span class="line">                    Transfer-Encoding: chunked</span><br><span class="line">                    Content-Type: application/json; charset=utf-8</span><br><span class="line">                    Date: Sun, 09 Apr 2023 14:43:10 GMT</span><br><span class="line">                    Server: Kestrel</span><br><span class="line"></span><br><span class="line">                    [&#123;&quot;date&quot;:&quot;2023-04-10&quot;,&quot;temperatureC&quot;:10,&quot;temperature...</span><br><span class="line">Forms             : &#123;&#125;</span><br><span class="line">Headers           : &#123;[Transfer-Encoding, chunked], [Content-Type, application/json; charset=utf-8], [Date, Sun, 09 Apr 2023 14:43:10 GMT], [Server, Kestrel]&#125;</span><br><span class="line">Images            : &#123;&#125;</span><br><span class="line">InputFields       : &#123;&#125;</span><br><span class="line">Links             : &#123;&#125;</span><br><span class="line">ParsedHtml        : mshtml.HTMLDocumentClass</span><br><span class="line">RawContentLength  : 383</span><br></pre></td></tr></table></figure>
+本篇到此结束，下一篇我们再来看看模板项目里究竟有哪些代码内容。</li>
+</ol>
+
+      
+    </div>
+
+    
+      
+
+    
+
+    <footer class="article-footer">
+      <a data-url="http://prebug.cn/2023/04/09/webapi-010/" data-id="clg9j3w9r0000809dahh254ll" class="article-share-link">
+        <i class="fa fa-share"></i> Share
+      </a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/C/" rel="tag">C#</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/asp-net-core/" rel="tag">asp.net core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/c-sharp/" rel="tag">c-sharp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dotnet/" rel="tag">dotnet</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dotnet-core/" rel="tag">dotnet core</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/webapi/" rel="tag">webapi</a></li></ul>
+
+
+    </footer>
+  </div>
+  
+    
+<ul id="article-nav" class="nav nav-pills nav-justified">
+  
+  <li role="presentation">
+    <a href="/2023/04/09/postgres-in-docker/" id="article-nav-older" class="article-nav-link-wrap">
+      <i class="fa fa-chevron-left pull-left"></i>
+      <span class="article-nav-link-title">在docker中启动PostgreSQL服务</span>
+    </a>
+  </li>
+  
+  
+</ul>
+
+
+  
+</article>
+
+
+
+
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          
+  <div class="sidebar-module sidebar-module-inset">
+  <h4>About</h4>
+  <p>一个忙忙碌碌，但是似乎是把一年的工作经验用了十几年的软件开发工程师。</p>
+
+</div>
+
+
+  
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tags</h4>
+    <ul class="sidebar-module-list" itemprop="keywords"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/C/" rel="tag">C#</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/PostgreSQL/" rel="tag">PostgreSQL</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/asp-net-core/" rel="tag">asp.net core</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/c-sharp/" rel="tag">c-sharp</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/docker/" rel="tag">docker</a><span class="sidebar-module-list-count">3</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/dotnet/" rel="tag">dotnet</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/dotnet-core/" rel="tag">dotnet core</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/get/" rel="tag">get</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/live/" rel="tag">live</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mongodb/" rel="tag">mongodb</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/mysql/" rel="tag">mysql</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/postgres/" rel="tag">postgres</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/spring-boot/" rel="tag">spring boot</a><span class="sidebar-module-list-count">1</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/tags/webapi/" rel="tag">webapi</a><span class="sidebar-module-list-count">1</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Tag Cloud</h4>
+    <p class="tagcloud">
+      <a href="/tags/C/" style="font-size: 10px;">C#</a> <a href="/tags/PostgreSQL/" style="font-size: 10px;">PostgreSQL</a> <a href="/tags/asp-net-core/" style="font-size: 10px;">asp.net core</a> <a href="/tags/c-sharp/" style="font-size: 10px;">c-sharp</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/dotnet/" style="font-size: 10px;">dotnet</a> <a href="/tags/dotnet-core/" style="font-size: 10px;">dotnet core</a> <a href="/tags/get/" style="font-size: 10px;">get</a> <a href="/tags/live/" style="font-size: 10px;">live</a> <a href="/tags/mongodb/" style="font-size: 10px;">mongodb</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/postgres/" style="font-size: 10px;">postgres</a> <a href="/tags/spring-boot/" style="font-size: 10px;">spring boot</a> <a href="/tags/webapi/" style="font-size: 10px;">webapi</a>
+    </p>
+  </div>
+
+
+  
+  <div class="sidebar-module">
+    <h4>Archives</h4>
+    <ul class="sidebar-module-list"><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2023/04/">四月 2023</a><span class="sidebar-module-list-count">3</span></li><li class="sidebar-module-list-item"><a class="sidebar-module-list-link" href="/archives/2022/08/">八月 2022</a><span class="sidebar-module-list-count">3</span></li></ul>
+  </div>
+
+
+
+  
+  <div class="sidebar-module">
+    <h4>Recents</h4>
+    <ul class="sidebar-module-list">
+      
+        <li>
+          <a href="/2023/04/09/webapi-010/">最初的WebApi</a>
+        </li>
+      
+        <li>
+          <a href="/2023/04/09/postgres-in-docker/">在docker中启动PostgreSQL服务</a>
+        </li>
+      
+        <li>
+          <a href="/2023/04/09/mysql-in-docker/">在docker中启动mysql服务</a>
+        </li>
+      
+        <li>
+          <a href="/2022/08/08/enhance-get-method/">扩展Spring Boot中的GET方法，支持复杂参数</a>
+        </li>
+      
+        <li>
+          <a href="/2022/08/05/life-1/">生活随感</a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+
+        </div>
+    </div>
+  </div>
+  <footer class="blog-footer">
+  <div class="container">
+    <div id="footer-info" class="inner">
+      &copy; 2023 任志伟<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a><br/>
+      <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/">京ICP备19039047号-2</a>
+    </div>
+  </div>
+</footer>
+
+  
+
+<script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js" ></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+</body>
+</html>
