@@ -4,6 +4,29 @@
   
   
   <entry>
+    <title>在docker中启动nextcloud服务</title>
+    <link href="/2023/04/11/nextcloud-in-docker/"/>
+    <url>/2023/04/11/nextcloud-in-docker/</url>
+    
+    <content type="html"><![CDATA[<h3 id="启动mysql"><a href="#启动mysql" class="headerlink" title="启动mysql"></a>启动mysql</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker run -itd --name mysql --restart=always -v c:\\docker\\mysql:/var/lib/mysql -p 13306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql<br></code></pre></td></tr></table></figure><h3 id="创建数据库，并进行用户配置"><a href="#创建数据库，并进行用户配置" class="headerlink" title="创建数据库，并进行用户配置"></a>创建数据库，并进行用户配置</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs sql"><span class="hljs-keyword">create</span> database nextcloud;<br><span class="hljs-keyword">grant</span> <span class="hljs-keyword">all</span> <span class="hljs-keyword">on</span> <span class="hljs-operator">*</span>.<span class="hljs-operator">*</span> <span class="hljs-keyword">to</span> <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span>;<br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">user</span> <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> identified <span class="hljs-keyword">by</span> <span class="hljs-string">&#x27;abc123&#x27;</span> password expire never;<br><span class="hljs-keyword">alter</span> <span class="hljs-keyword">user</span> <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> identified <span class="hljs-keyword">with</span> mysql_native_password <span class="hljs-keyword">by</span> <span class="hljs-string">&#x27;123456&#x27;</span>;<br>flush privileges;<br></code></pre></td></tr></table></figure><h3 id="启动nextcloud"><a href="#启动nextcloud" class="headerlink" title="启动nextcloud"></a>启动nextcloud</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker run -itd --restart=always -p 18888:80 -v c:\\docker\\nextcloud:/var/www/html --name nextcloud nextcloud<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>docker</tag>
+      
+      <tag>mysql</tag>
+      
+      <tag>nextcloud</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>最初的WebApi</title>
     <link href="/2023/04/09/webapi-010/"/>
     <url>/2023/04/09/webapi-010/</url>
